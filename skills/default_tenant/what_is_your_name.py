@@ -1,0 +1,2 @@
+"""what is your name"""
+print('Your Name  is a 2016 Japanese animated romantic fantasy film written and directed by Makoto Shinkai, produced by CoMix Wave Films, and distributed by Toho. The first installment of what critics deem Shinkai\'s "disaster trilogy"—followed by Weathering with You (2019) and Suzume (2022)—whose three entries share themes inspired by the frequency of natural disasters in Japan, it follows high school students Taki Tachibana and Mitsuha Miyamizu, who suddenly begin to swap bodies despite never having met, creating chaos in each other\'s lives.')

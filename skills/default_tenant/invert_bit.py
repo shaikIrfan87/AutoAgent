@@ -1,0 +1,1 @@
+invert_bit = lambda x: (int(not (x)))

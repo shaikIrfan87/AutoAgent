@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>AutoAgent Pro — Mindful Studio</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              base: "var(--app-base)",
+              surface: "var(--app-surface)",
+              elevated: "var(--app-elevated)",
+              subtleBg: "var(--app-subtleBg)",
+              border: "var(--app-border)",
+              borderStrong: "var(--app-borderStrong)",
+              subtle: "var(--app-subtle)",
+              muted: "var(--app-muted)",
+              text: "var(--app-text)",
+              heading: "var(--app-heading)"
+            },
+            sage: {
+              300: "#86efac",
+              400: "#4ade80",
+              500: "#22c55e",
+              subtle: "rgba(74, 222, 128, 0.12)",
+              border: "rgba(74, 222, 128, 0.25)"
+            },
+            eucalyptus: {
+              300: "#5eead4",
+              400: "#2dd4bf",
+              500: "#14b8a6",
+              subtle: "rgba(45, 212, 191, 0.12)"
+            },
+            calmAmber: {
+              400: "#fbbf24",
+              subtle: "rgba(251, 191, 36, 0.14)"
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --app-base: #f8fafc;
+      --app-surface: #ffffff;
+      --app-elevated: #f1f5f9;
+      --app-subtleBg: #f8fafc;
+      --app-border: #e2e8f0;
+      --app-borderStrong: #cbd5e1;
+      --app-subtle: #64748b;
+      --app-muted: #94a3b8;
+      --app-text: #334155;
+      --app-heading: #0f172a;
+    }
+    html.dark {
+      --app-base: #0e1315;
+      --app-surface: #151b1e;
+      --app-elevated: #1b2327;
+      --app-subtleBg: #12171a;
+      --app-border: #232d32;
+      --app-borderStrong: #2d3a40;
+      --app-subtle: #8b9ba3;
+      --app-muted: #596870;
+      --app-text: #e5edf0;
+      --app-heading: #f3f7f9;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      background-color: var(--app-base);
+      color: var(--app-text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(139, 155, 163, 0.18);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 155, 163, 0.32);
+    }
+    .hairline-b { border-bottom: 1px solid var(--app-border); }
+    .hairline-r { border-right: 1px solid var(--app-border); }
+    .hairline-t { border-top: 1px solid var(--app-border); }
+    .hairline-all { border: 1px solid var(--app-border); }
+
+    .chat-prose p {
+      margin-bottom: 0.85rem;
+      line-height: 1.68;
+    }
+    .chat-prose p:last-child {
+      margin-bottom: 0;
+    }
+    .chat-prose code:not(pre code) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84em;
+      background: rgba(45, 212, 191, 0.08);
+      padding: 0.18rem 0.42rem;
+      border-radius: 4px;
+      color: #14b8a6;
+      border: 1px solid rgba(45, 212, 191, 0.2);
+    }
+    html.dark .chat-prose code:not(pre code) {
+      color: #5eead4;
+    }
+    .chat-prose pre {
+      background: #090d0f;
+      border: 1px solid var(--app-border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.9rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      line-height: 1.6;
+      color: #d1e1e6;
+    }
+    .chat-prose strong {
+      font-weight: 600;
+      color: var(--app-heading);
+    }
+    .chat-prose blockquote {
+      border-left: 2px solid #34d399;
+      background: rgba(52, 211, 153, 0.05);
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      color: var(--app-text);
+      margin: 0.85rem 0;
+    }
+
+    @keyframes pulseCalm {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.96); }
+    }
+    .pulse-calm {
+      animation: pulseCalm 2.2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex antialiased select-none overflow-hidden">
+<!-- ==================== LEFT COLLAPSIBLE SIDEBAR ==================== -->
+<aside class="w-[270px] h-full flex flex-col bg-app-surface hairline-r flex-shrink-0 transition-all duration-300 z-30 relative shadow-lg" id="sidebar">
+  <!-- Top Workspace / Branding Header -->
+  <div class="h-14 px-3.5 flex items-center justify-between hairline-b">
+    <div class="flex items-center gap-2.5 overflow-hidden">
+      <div class="w-6 h-6 rounded-md bg-eucalyptus-subtle border border-eucalyptus-400/30 flex items-center justify-center flex-shrink-0 text-eucalyptus-400">
+        <span class="material-symbols-outlined text-[15px]">spa</span>
+      </div>
+      <div class="flex items-baseline gap-1.5 truncate">
+        <span class="text-[13px] font-semibold tracking-tight text-app-heading">AutoAgent</span>
+        <span class="text-[10px] uppercase font-medium text-emerald-500 px-1 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">Studio</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-1">
+      <button class="p-1 rounded-md text-app-subtle hover:text-app-heading hover:bg-app-elevated transition-colors" id="collapseSidebarBtn" title="Collapse sidebar (⌘[)">
+        <span class="material-symbols-outlined text-[18px]">left_panel_close</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick Action / New Chat -->
+  <div class="p-3 space-y-2">
+    <button class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-app-subtleBg hover:bg-app-elevated border border-app-border hover:border-app-borderStrong text-[13px] font-medium text-app-heading transition-all group" id="newChatBtn">
+      <span class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[17px] text-emerald-500 group-hover:rotate-90 transition-transform">add</span>
+        <span>New chat</span>
+      </span>
+      <kbd class="text-[10px] font-mono text-app-muted bg-app-surface px-1.5 py-0.5 rounded border border-app-border">⌘N</kbd>
+    </button>
+    <!-- Search bar -->
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-app-muted pointer-events-none">search</span>
+      <input class="w-full bg-app-base pl-8 pr-3 py-1.5 text-[12px] text-app-text placeholder-app-muted rounded-md border border-app-border focus:outline-none focus:border-emerald-500 transition-colors" id="searchChatInput" placeholder="Search threads or memories..." type="text"/>
+    </div>
+  </div>
+
+  <!-- Invariant Telemetry Pill Display -->
+  <div class="px-3 pb-1">
+    <div class="p-2.5 rounded-lg bg-app-base border border-app-border text-[11px] space-y-1.5">
+      <div class="flex items-center justify-between text-app-heading font-medium">
+        <span>Invariants 1–5</span>
+        <span class="inline-flex items-center gap-1 text-emerald-500 font-mono text-[10px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-calm"></span>
+          <span>ONLINE</span>
+        </span>
+      </div>
+      <div class="flex items-center justify-between text-app-muted">
+        <span>Consolidated WAL:</span>
+        <span class="font-mono text-app-heading" id="sidebarMemCount">254</span>
+      </div>
+      <div class="flex items-center justify-between text-app-muted">
+        <span>||A_fast|| Frobenius:</span>
+        <span class="font-mono text-app-heading" id="sidebarOjaNorm">0.0000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable Conversation & Memory History -->
+  <div class="flex-1 overflow-y-auto px-2 py-1 space-y-4" id="threadListContainer">
+    <!-- Section: Today -->
+    <div class="space-y-0.5 thread-group">
+      <div class="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-app-muted">Recent Sessions</div>
+      <div class="thread-item active group relative flex items-center justify-between px-2.5 py-1.5 rounded-md bg-app-elevated text-app-heading text-[12.5px] font-medium cursor-pointer border border-emerald-500/30 transition-colors" data-id="arch-review">
+        <div class="flex items-center gap-2 truncate pr-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+          <span class="truncate">Live Reasoning Session</span>
+        </div>
+        <span class="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 text-app-muted hover:text-app-heading transition-opacity">more_horiz</span>
+      </div>
+    </div>
+
+    <!-- Section: Consolidated Memories from Engine -->
+    <div class="space-y-0.5 thread-group">
+      <div class="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-app-muted">Consolidated Memory Vault</div>
+      <div id="memoryItemsList" class="space-y-1">
+        <div class="px-2.5 py-1.5 text-[11px] text-app-muted italic">Loading memories...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pinned User / Account Section -->
+  <div class="p-2.5 hairline-t bg-app-surface/90 space-y-1">
+    <div class="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-app-elevated transition-colors cursor-pointer group" id="userProfileBtn">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xs font-semibold text-emerald-500 flex-shrink-0">
+          AA
+        </div>
+        <div class="flex flex-col truncate">
+          <span class="text-[12.5px] font-medium text-app-heading leading-tight truncate">AutoAgent Core</span>
+          <span class="text-[10.5px] text-emerald-500 leading-tight">System 1 & System 2 Online</span>
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-[16px] text-app-muted group-hover:text-app-subtle">unfold_more</span>
+    </div>
+    <!-- Quick util links -->
+    <div class="grid grid-cols-3 gap-1 pt-1 text-[11px] text-app-muted">
+      <button class="flex items-center justify-center gap-1 py-1 rounded hover:bg-app-elevated hover:text-app-heading transition-colors" id="openConfigBtn" title="Settings">
+        <span class="material-symbols-outlined text-[14px]">settings</span>
+        <span>Config</span>
+      </button>
+      <button class="flex items-center justify-center gap-1 py-1 rounded hover:bg-app-elevated hover:text-app-heading transition-colors" id="openShortcutsBtn" title="Shortcuts">
+        <span class="material-symbols-outlined text-[14px]">keyboard</span>
+        <span>Keys</span>
+      </button>
+      <button class="flex items-center justify-center gap-1 py-1 rounded hover:bg-app-elevated hover:text-app-heading transition-colors" id="openHelpBtn" title="Documentation & Feedback">
+        <span class="material-symbols-outlined text-[14px]">help_outline</span>
+        <span>Help</span>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ==================== MAIN CONVERSATIONAL CANVAS ==================== -->
+<div class="flex-1 flex flex-col h-full overflow-hidden bg-app-base relative">
+  <!-- Minimal Serene Header -->
+  <header class="h-14 px-4 flex items-center justify-between hairline-b bg-app-base/80 backdrop-blur-md z-20 flex-shrink-0">
+    <div class="flex items-center gap-3">
+      <button class="hidden p-1.5 rounded-md text-app-subtle hover:text-app-heading hover:bg-app-elevated transition-colors" id="openSidebarBtn" title="Open sidebar (⌘[)">
+        <span class="material-symbols-outlined text-[19px]">menu</span>
+      </button>
+      <!-- Model Switcher Selector -->
+      <div class="relative">
+        <button class="flex items-center gap-2 px-2.5 py-1 rounded-md bg-app-surface hover:bg-app-elevated border border-app-border text-[12.5px] font-medium text-app-heading transition-colors" id="modelSelectorBtn">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span id="currentModelLabel">Qwen-2.5-Coder (TTT-Modulated)</span>
+          <span class="text-[11px] text-app-muted font-normal">· Active Cortex</span>
+          <span class="material-symbols-outlined text-[15px] text-app-muted">expand_more</span>
+        </button>
+        <!-- Dropdown menu -->
+        <div class="hidden absolute left-0 mt-1.5 w-64 rounded-xl bg-app-surface border border-app-border shadow-2xl p-1.5 z-50 text-left" id="modelDropdown">
+          <button class="model-option w-full flex flex-col px-2.5 py-2 rounded-lg hover:bg-app-elevated text-left text-[12px] transition-colors" data-model="Qwen-2.5-Coder (TTT-Modulated)">
+            <span class="font-medium text-app-heading flex items-center justify-between">
+              Qwen-2.5-Coder:3b / 7b
+              <span class="text-[10px] text-emerald-500 font-mono">Local Live</span>
+            </span>
+            <span class="text-[11px] text-app-muted">Fast-weight KV attention modulated</span>
+          </button>
+          <button class="model-option w-full flex flex-col px-2.5 py-2 rounded-lg hover:bg-app-elevated text-left text-[12px] transition-colors" data-model="Deep Causal Deliberator">
+            <span class="font-medium text-app-heading flex items-center justify-between">Deep Causal Deliberator</span>
+            <span class="text-[11px] text-app-muted">Axiom graph veto & sandbox verification</span>
+          </button>
+          <button class="model-option w-full flex flex-col px-2.5 py-2 rounded-lg hover:bg-app-elevated text-left text-[12px] transition-colors" data-model="Direct System 1 Fast Recall">
+            <span class="font-medium text-app-heading flex items-center justify-between">Direct System 1</span>
+            <span class="text-[11px] text-app-muted">Hybrid SQLite FTS5 + Dense Vector</span>
+          </button>
+        </div>
+      </div>
+      <span class="hidden sm:inline-block text-[11.5px] text-emerald-600 dark:text-emerald-400 font-mono px-2 py-0.5 rounded border border-emerald-500/20 bg-emerald-500/10" id="headerTelemetryBadge">
+        Invariant Diode Active
+      </span>
+    </div>
+
+    <!-- Right Header Actions -->
+    <div class="flex items-center gap-2">
+      <button class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-[12px] font-medium text-app-subtle hover:text-app-heading rounded-md hover:bg-app-elevated transition-colors" id="shareChatBtn">
+        <span class="material-symbols-outlined text-[15px]">share</span>
+        <span id="shareBtnText">Share</span>
+      </button>
+      <button class="p-1.5 rounded-md text-app-subtle hover:text-app-heading hover:bg-app-elevated transition-colors" id="exportSessionBtn" title="Export session">
+        <span class="material-symbols-outlined text-[17px]">download</span>
+      </button>
+      <div class="h-4 w-px bg-app-border mx-0.5"></div>
+      <button class="p-1.5 rounded-md text-app-subtle hover:text-app-heading hover:bg-app-elevated transition-colors" id="clearChatCanvasBtn" title="Clear current canvas">
+        <span class="material-symbols-outlined text-[17px]">restart_alt</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Scrollable Chat Stream / Canvas Body -->
+  <main class="flex-1 overflow-y-auto px-4 sm:px-8 pt-6 pb-44 flex justify-center scroll-smooth" id="chatCanvas">
+    <div class="w-full max-w-[760px] flex flex-col">
+      <!-- Welcome / Clean Calm Empty State -->
+      <div class="my-auto py-10 flex flex-col items-center text-center" id="welcomeState">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-app-surface border border-app-border text-[11.5px] text-app-subtle mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-calm"></span>
+          <span id="statusWelcomeText">AutoAgent Runtime Online · Invariants 1–5 Ready</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-medium tracking-tight text-app-heading mb-2">
+          What would you like to explore or verify?
+        </h1>
+        <p class="text-[14px] text-app-subtle max-w-md font-normal leading-relaxed mb-8">
+          Engage neuro-symbolic reasoning, run sandboxed Python computations, or formulate verifiable causal hypotheses.
+        </p>
+        <!-- 4 Modular Starter Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full text-left">
+          <button class="prompt-starter group p-3.5 rounded-xl bg-app-surface hover:bg-app-elevated border border-app-border hover:border-emerald-500/40 transition-all text-left flex flex-col justify-between min-h-[96px] shadow-sm hover:shadow-md" data-prompt="calculate kinetic energy: mass=1000, velocity=20">
+            <div class="flex items-center justify-between mb-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                <span class="material-symbols-outlined text-[14px]">science</span>
+                Physics Computation
+              </span>
+              <span class="material-symbols-outlined text-[14px] text-app-muted group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all">north_east</span>
+            </div>
+            <span class="text-[13px] text-app-heading font-normal line-clamp-2">
+              calculate kinetic energy: mass=1000, velocity=20
+            </span>
+          </button>
+          <button class="prompt-starter group p-3.5 rounded-xl bg-app-surface hover:bg-app-elevated border border-app-border hover:border-emerald-500/40 transition-all text-left flex flex-col justify-between min-h-[96px] shadow-sm hover:shadow-md" data-prompt="What is the second law of thermodynamics?">
+            <div class="flex items-center justify-between mb-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-teal-600 dark:text-teal-400">
+                <span class="material-symbols-outlined text-[14px]">account_tree</span>
+                Causal Graph Verification
+              </span>
+              <span class="material-symbols-outlined text-[14px] text-app-muted group-hover:text-teal-500 group-hover:translate-x-0.5 transition-all">north_east</span>
+            </div>
+            <span class="text-[13px] text-app-heading font-normal line-clamp-2">
+              Verify thermodynamic conservation laws and entropy bounds
+            </span>
+          </button>
+          <button class="prompt-starter group p-3.5 rounded-xl bg-app-surface hover:bg-app-elevated border border-app-border hover:border-emerald-500/40 transition-all text-left flex flex-col justify-between min-h-[96px] shadow-sm hover:shadow-md" data-prompt="Write an optimized Python function to factorize integers into prime factors.">
+            <div class="flex items-center justify-between mb-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-cyan-600 dark:text-cyan-400">
+                <span class="material-symbols-outlined text-[14px]">code</span>
+                Program Induction
+              </span>
+              <span class="material-symbols-outlined text-[14px] text-app-muted group-hover:text-cyan-500 group-hover:translate-x-0.5 transition-all">north_east</span>
+            </div>
+            <span class="text-[13px] text-app-heading font-normal line-clamp-2">
+              Synthesize prime factorization with sandbox unit tests
+            </span>
+          </button>
+          <button class="prompt-starter group p-3.5 rounded-xl bg-app-surface hover:bg-app-elevated border border-app-border hover:border-emerald-500/40 transition-all text-left flex flex-col justify-between min-h-[96px] shadow-sm hover:shadow-md" data-prompt="explain how test-time training adapts attention key-value projections">
+            <div class="flex items-center justify-between mb-2">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                <span class="material-symbols-outlined text-[14px]">psychology</span>
+                TTT Plasticity
+              </span>
+              <span class="material-symbols-outlined text-[14px] text-app-muted group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all">north_east</span>
+            </div>
+            <span class="text-[13px] text-app-heading font-normal line-clamp-2">
+              Explain how fast weights modulate multi-head KV attention
+            </span>
+          </button>
+        </div>
+      </div>
+      <!-- Dynamic Message History Container -->
+      <div class="w-full space-y-7 py-2" id="messagesList"></div>
+    </div>
+  </main>
+
+  <!-- ==================== FLOATING BOTTOM INPUT DOCK ==================== -->
+  <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-5 bg-gradient-to-t from-app-base via-app-base/95 to-transparent flex justify-center pointer-events-none z-30">
+    <div class="w-full max-w-[760px] pointer-events-auto flex flex-col gap-2">
+      <!-- Input Surface Container -->
+      <div class="bg-app-surface/95 backdrop-blur-xl rounded-2xl hairline-all shadow-2xl p-2.5 transition-all duration-200 focus-within:border-emerald-500/40 focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.15)] dark:focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
+        <!-- Textarea area -->
+        <div class="px-2 pt-1 pb-1">
+          <textarea class="w-full bg-transparent resize-none border-0 text-[14px] text-app-heading placeholder-app-muted focus:ring-0 p-0 focus:outline-none leading-relaxed max-h-40 overflow-y-auto" id="promptTextarea" placeholder="Ask anything, submit computation, or explore verified invariants..." rows="1"></textarea>
+        </div>
+        <!-- Bottom Control Bar (Tool Chips & Actions) -->
+        <div class="flex items-center justify-between pt-2 border-t border-app-border/70 mt-1">
+          <!-- Tool Capability Chips with peaceful styling -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button class="tool-pill px-2.5 py-1 rounded-md text-[11.5px] font-medium transition-colors flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 bg-emerald-500/10" data-active="true" title="Invariant 2: Causal Axiom Verification" type="button">
+              <span class="material-symbols-outlined text-[14px]">shield</span>
+              <span>Causal Guard</span>
+            </button>
+            <button class="tool-pill px-2.5 py-1 rounded-md text-[11.5px] font-medium transition-colors flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 bg-emerald-500/10" data-active="true" title="Invariant 3: Isolated Python AST Sandbox" type="button">
+              <span class="material-symbols-outlined text-[14px]">terminal</span>
+              <span>Sandbox Grounding</span>
+            </button>
+            <button class="tool-pill px-2.5 py-1 rounded-md text-[11.5px] font-medium transition-colors flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 bg-emerald-500/10" data-active="true" title="Invariant 4: TTT KV Attention Modulation" type="button">
+              <span class="material-symbols-outlined text-[14px]">tune</span>
+              <span>TTT Plasticity</span>
+            </button>
+          </div>
+          <!-- Send Trigger -->
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <button class="w-7 h-7 rounded-lg bg-app-elevated text-app-muted cursor-not-allowed flex items-center justify-center transition-all ml-1 duration-150" disabled="" id="sendButton" title="Send message (Enter)">
+              <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Subtle Hint footer -->
+      <div class="flex items-center justify-between px-2 text-[11px] text-app-muted select-none">
+        <div class="flex items-center gap-2">
+          <span>Invariants: 5/5 Operational</span>
+          <span>·</span>
+          <span class="hover:text-emerald-500 cursor-pointer transition-colors" id="privacyBadge">Deterministic Subprocess Sandbox</span>
+        </div>
+        <div class="hidden sm:block">
+          <span>Enter to send · Shift + Enter for newline</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONFIG & PREFERENCES MODAL ==================== -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" id="settingsModal">
+  <div class="w-full max-w-lg rounded-2xl bg-app-surface border border-app-border shadow-2xl p-6 relative text-left">
+    <div class="flex items-center justify-between pb-4 hairline-b">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-emerald-500 text-[20px]">tune</span>
+        <h2 class="text-base font-semibold text-app-heading">Studio Settings & Preferences</h2>
+      </div>
+      <button class="p-1 rounded-md text-app-muted hover:text-app-heading hover:bg-app-elevated transition-colors" id="closeSettingsBtn">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+
+    <div class="py-4 space-y-4 text-[13px]">
+      <!-- THEME TOGGLE: BRIGHT / DARK / SYSTEM -->
+      <div class="space-y-2">
+        <label class="block text-app-heading font-medium">Appearance & Color Theme</label>
+        <div class="grid grid-cols-3 gap-2 p-1 bg-app-base rounded-xl border border-app-border">
+          <button type="button" class="theme-toggle-btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-[12px] font-medium transition-all" data-theme="bright" id="themeBtnBright">
+            <span class="material-symbols-outlined text-[16px]">light_mode</span>
+            <span>Bright</span>
+          </button>
+          <button type="button" class="theme-toggle-btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-[12px] font-medium transition-all" data-theme="dark" id="themeBtnDark">
+            <span class="material-symbols-outlined text-[16px]">dark_mode</span>
+            <span>Dark</span>
+          </button>
+          <button type="button" class="theme-toggle-btn flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-[12px] font-medium transition-all" data-theme="system" id="themeBtnSystem">
+            <span class="material-symbols-outlined text-[16px]">desktop_windows</span>
+            <span>System</span>
+          </button>
+        </div>
+        <p class="text-[11px] text-app-muted">Switch seamlessly between mindful high-contrast bright and calm studio dark modes.</p>
+      </div>
+
+      <!-- Sampling Temperature -->
+      <div class="space-y-1.5 pt-2">
+        <div class="flex justify-between">
+          <span class="text-app-heading font-medium">Sampling Temperature</span>
+          <span class="font-mono text-emerald-500 text-[12px]" id="tempValueDisplay">0.1 (Analytical)</span>
+        </div>
+        <input class="w-full accent-emerald-500 bg-app-base h-1.5 rounded-lg appearance-none cursor-pointer" id="temperatureSlider" max="1" min="0" step="0.05" type="range" value="0.1"/>
+        <p class="text-[11px] text-app-muted">Lower values guarantee deterministic, theorem-compliant derivations.</p>
+      </div>
+
+      <!-- Zero-Retention / Sandbox Isolation -->
+      <div class="flex items-center justify-between pt-2">
+        <div>
+          <div class="text-app-heading font-medium">Isolated AST Sandbox Guard</div>
+          <div class="text-[11px] text-app-muted">Intercept unsafe system calls before running subprocesses.</div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input checked="" class="sr-only peer" id="sandboxGuardCheck" type="checkbox"/>
+          <div class="w-9 h-5 bg-app-elevated border border-app-border rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+        </label>
+      </div>
+
+      <!-- Deliberation Protocol -->
+      <div class="pt-2">
+        <label class="block text-app-heading font-medium mb-1">Reasoning Execution Engine</label>
+        <select class="w-full bg-app-base border border-app-border rounded-lg text-app-text text-[12px] p-2 focus:border-emerald-500 focus:outline-none">
+          <option>Unified Cognitive Deliberation (System 1 + System 2)</option>
+          <option>Direct Associative System 1 (Instant Fast Weights)</option>
+          <option>Deterministic Sandboxed Solver Only</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-4 hairline-t">
+      <button class="px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-[12.5px] transition-colors" id="saveSettingsBtn">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ACCOUNT PROFILE MODAL ==================== -->
+<div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" id="accountModal">
+  <div class="w-full max-w-sm rounded-2xl bg-app-surface border border-app-border shadow-2xl p-5 relative">
+    <div class="flex items-center justify-between pb-3 hairline-b">
+      <h3 class="text-sm font-semibold text-app-heading">AutoAgent Telemetry</h3>
+      <button class="p-1 rounded-md text-app-muted hover:text-app-heading hover:bg-app-elevated transition-colors" id="closeAccountBtn">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <div class="py-4 flex flex-col items-center text-center">
+      <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-500 font-semibold text-lg mb-2">
+        AA
+      </div>
+      <div class="font-medium text-app-heading text-[14px]">AutoAgent Cognitive Runtime</div>
+      <div class="text-[12px] text-app-muted mb-4 font-mono">assets/cognitive_memory.db (WAL)</div>
+      <div class="w-full p-3 rounded-xl bg-app-elevated border border-app-border text-left text-[12px] space-y-2">
+        <div class="flex justify-between">
+          <span class="text-app-muted">Invariants Status</span>
+          <span class="text-emerald-500 font-medium">5/5 Verified</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-app-muted">Memory Commitments</span>
+          <span class="font-mono text-app-heading" id="modalMemCount">254</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-app-muted">TTT Oja Norm</span>
+          <span class="font-mono text-app-heading" id="modalOjaNorm">0.0000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LOGIC & INTERACTIONS ==================== -->
+<script>
+  (function () {
+    const sidebar = document.getElementById('sidebar');
+    const collapseSidebarBtn = document.getElementById('collapseSidebarBtn');
+    const openSidebarBtn = document.getElementById('openSidebarBtn');
+    const promptTextarea = document.getElementById('promptTextarea');
+    const sendButton = document.getElementById('sendButton');
+    const welcomeState = document.getElementById('welcomeState');
+    const messagesList = document.getElementById('messagesList');
+    const chatCanvas = document.getElementById('chatCanvas');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const starters = document.querySelectorAll('.prompt-starter');
+    const searchChatInput = document.getElementById('searchChatInput');
+    const modelSelectorBtn = document.getElementById('modelSelectorBtn');
+    const modelDropdown = document.getElementById('modelDropdown');
+    const modelOptions = document.querySelectorAll('.model-option');
+    const currentModelLabel = document.getElementById('currentModelLabel');
+    const shareChatBtn = document.getElementById('shareChatBtn');
+    const shareBtnText = document.getElementById('shareBtnText');
+    const clearChatCanvasBtn = document.getElementById('clearChatCanvasBtn');
+    const openConfigBtn = document.getElementById('openConfigBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    const accountModal = document.getElementById('accountModal');
+    const closeAccountBtn = document.getElementById('closeAccountBtn');
+    const temperatureSlider = document.getElementById('temperatureSlider');
+    const tempValueDisplay = document.getElementById('tempValueDisplay');
+
+    // Theme toggle buttons
+    const themeBtnBright = document.getElementById('themeBtnBright');
+    const themeBtnDark = document.getElementById('themeBtnDark');
+    const themeBtnSystem = document.getElementById('themeBtnSystem');
+    const themeButtons = [themeBtnBright, themeBtnDark, themeBtnSystem];
+
+    let isGenerating = false;
+
+    // --- THEME MANAGEMENT (BRIGHT / DARK / SYSTEM) ---
+    function applyTheme(theme) {
+      localStorage.setItem('autoagent_theme', theme);
+
+      let effectiveDark = false;
+      if (theme === 'bright') {
+        effectiveDark = false;
+      } else if (theme === 'dark') {
+        effectiveDark = true;
+      } else {
+        // System preference
+        effectiveDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+
+      if (effectiveDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      // Update UI active states
+      themeButtons.forEach(btn => {
+        const btnTheme = btn.getAttribute('data-theme');
+        if (btnTheme === theme) {
+          btn.classList.add('bg-app-surface', 'text-emerald-500', 'shadow-sm', 'border', 'border-emerald-500/30');
+          btn.classList.remove('text-app-muted', 'hover:text-app-heading');
+        } else {
+          btn.classList.remove('bg-app-surface', 'text-emerald-500', 'shadow-sm', 'border', 'border-emerald-500/30');
+          btn.classList.add('text-app-muted', 'hover:text-app-heading');
+        }
+      });
+    }
+
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('autoagent_theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // Watch for system preference changes
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (localStorage.getItem('autoagent_theme') === 'system') {
+          applyTheme('system');
+        }
+      });
+    }
+
+    themeBtnBright.addEventListener('click', () => applyTheme('bright'));
+    themeBtnDark.addEventListener('click', () => applyTheme('dark'));
+    themeBtnSystem.addEventListener('click', () => applyTheme('system'));
+
+    // --- TELEMETRY SYNC ---
+    async function updateTelemetry() {
+      try {
+        const res = await fetch('/api/telemetry');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const memCountEl = document.getElementById('sidebarMemCount');
+        const ojaNormEl = document.getElementById('sidebarOjaNorm');
+        const modalMemEl = document.getElementById('modalMemCount');
+        const modalOjaEl = document.getElementById('modalOjaNorm');
+        
+        if (memCountEl) memCountEl.textContent = data.memory_count;
+        if (ojaNormEl) ojaNormEl.textContent = data.oja_norm.toFixed(4);
+        if (modalMemEl) modalMemEl.textContent = data.memory_count;
+        if (modalOjaEl) modalOjaEl.textContent = data.oja_norm.toFixed(4);
+
+        const listEl = document.getElementById('memoryItemsList');
+        if (listEl && data.recent_memories) {
+          listEl.innerHTML = '';
+          data.recent_memories.forEach(m => {
+            const d = document.createElement('div');
+            d.className = 'px-2.5 py-1.5 rounded-md hover:bg-app-elevated text-[11.5px] cursor-pointer transition-colors border border-transparent hover:border-app-border text-app-subtle hover:text-app-text truncate';
+            d.title = m.content;
+            d.innerHTML = `<span class="text-emerald-500 font-mono text-[10px] mr-1">#${m.id}</span>${escapeHtml(m.content.slice(0, 32))}...`;
+            d.addEventListener('click', () => {
+              promptTextarea.value = m.content.split('|')[0].replace('Query:', '').trim();
+              syncTextarea();
+              promptTextarea.focus();
+            });
+            listEl.appendChild(d);
+          });
+        }
+      } catch (e) {
+        console.debug("Telemetry polling skipped:", e);
+      }
+    }
+    setInterval(updateTelemetry, 3500);
+    updateTelemetry();
+
+    // Sidebar Collapse / Expand
+    collapseSidebarBtn.addEventListener('click', () => {
+      sidebar.classList.add('-ml-[270px]');
+      openSidebarBtn.classList.remove('hidden');
+    });
+
+    openSidebarBtn.addEventListener('click', () => {
+      sidebar.classList.remove('-ml-[270px]');
+      openSidebarBtn.classList.add('hidden');
+    });
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === '[') {
+        e.preventDefault();
+        if (sidebar.classList.contains('-ml-[270px]')) {
+          sidebar.classList.remove('-ml-[270px]');
+          openSidebarBtn.classList.add('hidden');
+        } else {
+          sidebar.classList.add('-ml-[270px]');
+          openSidebarBtn.classList.remove('hidden');
+        }
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        startNewSession();
+      }
+      if (e.key === 'Escape') {
+        settingsModal.classList.add('hidden');
+        accountModal.classList.add('hidden');
+        modelDropdown.classList.add('hidden');
+      }
+    });
+
+    // Model Selector
+    modelSelectorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      modelDropdown.classList.toggle('hidden');
+    });
+
+    modelOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        currentModelLabel.textContent = opt.getAttribute('data-model');
+        modelDropdown.classList.add('hidden');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      modelDropdown.classList.add('hidden');
+    });
+
+    // Textarea input sync
+    function syncTextarea() {
+      promptTextarea.style.height = 'auto';
+      promptTextarea.style.height = Math.min(promptTextarea.scrollHeight, 160) + 'px';
+
+      const hasValue = promptTextarea.value.trim().length > 0;
+      if (hasValue && !isGenerating) {
+        sendButton.removeAttribute('disabled');
+        sendButton.classList.remove('bg-app-elevated', 'text-app-muted', 'cursor-not-allowed');
+        sendButton.classList.add('bg-emerald-500', 'text-black', 'hover:bg-emerald-400', 'cursor-pointer', 'shadow-sm');
+      } else {
+        sendButton.setAttribute('disabled', 'true');
+        sendButton.classList.add('bg-app-elevated', 'text-app-muted', 'cursor-not-allowed');
+        sendButton.classList.remove('bg-emerald-500', 'text-black', 'hover:bg-emerald-400', 'cursor-pointer', 'shadow-sm');
+      }
+    }
+
+    promptTextarea.addEventListener('input', syncTextarea);
+
+    promptTextarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (promptTextarea.value.trim() && !isGenerating) {
+          sendMessage(promptTextarea.value.trim());
+        }
+      }
+    });
+
+    sendButton.addEventListener('click', () => {
+      if (promptTextarea.value.trim() && !isGenerating) {
+        sendMessage(promptTextarea.value.trim());
+      }
+    });
+
+    starters.forEach(card => {
+      card.addEventListener('click', () => {
+        const prompt = card.getAttribute('data-prompt');
+        if (prompt && !isGenerating) {
+          sendMessage(prompt);
+        }
+      });
+    });
+
+    newChatBtn.addEventListener('click', startNewSession);
+    clearChatCanvasBtn.addEventListener('click', startNewSession);
+
+    function startNewSession() {
+      messagesList.innerHTML = '';
+      welcomeState.style.display = 'flex';
+      promptTextarea.value = '';
+      syncTextarea();
+      promptTextarea.focus();
+    }
+
+    function scrollToBottom() {
+      chatCanvas.scrollTop = chatCanvas.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function parseMarkdown(text) {
+      const codeBlocks = [];
+      let clean = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (_, lang, code) => {
+        const id = codeBlocks.length;
+        codeBlocks.push({ lang: lang || 'python', code: code.trim() });
+        return `%%CODE_BLOCK_${id}%%`;
+      });
+
+      clean = clean.replace(/`([^`]+)`/g, '<code>$1</code>');
+      clean = clean.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      clean = clean.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      clean = clean.replace(/^###\s+(.+)$/gm, '<h3 class="text-[14px] font-semibold text-app-heading mt-3 mb-1.5">$1</h3>');
+      clean = clean.replace(/^##\s+(.+)$/gm, '<h2 class="text-[15px] font-semibold text-app-heading mt-3.5 mb-2">$1</h2>');
+      clean = clean.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+      clean = clean.replace(/^\s*[-*]\s+(.+)$/gm, '<li class="flex items-start gap-2 mb-1"><span class="text-emerald-500 mt-1.5 text-[8px]">●</span><span>$1</span></li>');
+      clean = clean.replace(/(<li.*<\/li>)/s, '<ul class="my-2 pl-1 space-y-1">$1</ul>');
+
+      const paragraphs = clean.split(/\n\s*\n/).map(p => {
+        p = p.trim();
+        if (!p) return '';
+        if (p.startsWith('%%CODE_BLOCK_') || p.startsWith('<ul') || p.startsWith('<blockquote>') || p.startsWith('<h2') || p.startsWith('<h3')) {
+          return p;
+        }
+        return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+      }).join('');
+
+      return paragraphs.replace(/%%CODE_BLOCK_(\d+)%%/g, (_, id) => {
+        const item = codeBlocks[Number(id)];
+        const escaped = escapeHtml(item.code);
+        return `
+          <div class="my-3 rounded-lg border border-app-border bg-[#090d0f] overflow-hidden">
+            <div class="flex items-center justify-between px-3 py-1.5 bg-app-surface border-b border-app-border text-[11px] font-mono text-app-muted">
+              <span class="text-emerald-500 font-medium">${item.lang}</span>
+              <button onclick="navigator.clipboard.writeText(this.closest('.my-3').querySelector('code').innerText); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy', 1800);" class="hover:text-app-heading transition-colors flex items-center gap-1 text-[11px]">
+                <span class="material-symbols-outlined text-[13px]">content_copy</span>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre class="p-3.5 m-0 font-mono text-[12.5px] leading-relaxed overflow-x-auto text-[#d4e4e9]"><code>${escaped}</code></pre>
+          </div>
+        `;
+      });
+    }
+
+    // REAL BACKEND QUERY EXECUTION
+    async function sendMessage(text) {
+      if (isGenerating) return;
+      isGenerating = true;
+
+      welcomeState.style.display = 'none';
+      promptTextarea.value = '';
+      syncTextarea();
+
+      // 1. User Message
+      const userRow = document.createElement('div');
+      userRow.className = 'flex justify-end';
+      userRow.innerHTML = `
+        <div class="max-w-[85%] bg-app-surface rounded-xl px-4 py-3 hairline-all text-[13.5px] text-app-heading leading-relaxed shadow-sm">
+          ${escapeHtml(text)}
+        </div>
+      `;
+      messagesList.appendChild(userRow);
+      scrollToBottom();
+
+      // 2. Assistant Message Skeleton
+      const assistantRow = document.createElement('div');
+      assistantRow.className = 'flex items-start gap-3 w-full';
+      
+      const avatar = `
+        <div class="w-6 h-6 rounded-md bg-eucalyptus-subtle border border-emerald-500/20 flex items-center justify-center flex-shrink-0 text-emerald-500 mt-0.5">
+          <span class="material-symbols-outlined text-[15px]">spa</span>
+        </div>
+      `;
+
+      const contentWrapper = document.createElement('div');
+      contentWrapper.className = 'flex-1 min-w-0';
+      contentWrapper.innerHTML = `
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[12px] font-medium text-app-heading tracking-tight">AutoAgent</span>
+          <span class="text-[10.5px] text-app-muted font-mono">${currentModelLabel.textContent}</span>
+        </div>
+        <div class="trace-container mb-2 flex flex-wrap gap-1 hidden"></div>
+        <div class="assistant-content text-[13.5px] leading-relaxed text-app-text chat-prose">
+          <div class="inline-flex items-center gap-2 text-[12px] text-emerald-500 font-normal py-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-calm"></span>
+            <span>Deliberating through Invariants 1–5...</span>
+          </div>
+        </div>
+      `;
+
+      assistantRow.innerHTML = avatar;
+      assistantRow.appendChild(contentWrapper);
+      messagesList.appendChild(assistantRow);
+      scrollToBottom();
+
+      const traceContainer = contentWrapper.querySelector('.trace-container');
+      const contentEl = contentWrapper.querySelector('.assistant-content');
+
+      function addTracePill(text, type = 'trace') {
+        traceContainer.classList.remove('hidden');
+        const pill = document.createElement('div');
+        pill.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono border mr-1 mb-1 transition-all';
+        if (type === 'rollout') {
+          pill.className += ' bg-amber-500/10 border-amber-500/20 text-amber-400';
+          pill.innerHTML = `<span class="material-symbols-outlined text-[13px]">psychology</span> <span>${escapeHtml(text)}</span>`;
+        } else if (type === 'invariant') {
+          pill.className += ' bg-emerald-500/10 border-emerald-500/20 text-emerald-400';
+          pill.innerHTML = `<span class="material-symbols-outlined text-[13px]">verified</span> <span>${escapeHtml(text)}</span>`;
+        } else {
+          pill.className += ' bg-cyan-500/10 border-cyan-500/20 text-cyan-400';
+          pill.innerHTML = `<span class="material-symbols-outlined text-[13px]">sync</span> <span>${escapeHtml(text)}</span>`;
+        }
+        traceContainer.appendChild(pill);
+        scrollToBottom();
+      }
+
+      // Send to FastAPI /api/interact/stream (with fallback to /api/interact)
+      try {
+        const response = await fetch('/api/interact/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: text })
+        });
+
+        if (!response.ok || !response.body) {
+          const fallbackRes = await fetch('/api/interact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: text })
+          });
+          const data = await fallbackRes.json();
+          contentEl.innerHTML = parseMarkdown(data.response || data.error || "Completed.");
+        } else {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith('data:')) continue;
+              const rawJson = trimmed.slice(5).trim();
+              if (!rawJson) continue;
+              try {
+                const event = JSON.parse(rawJson);
+                if (event.type === 'invariant' || event.type === 'rollout' || event.type === 'deliberation') {
+                  addTracePill(event.message, event.type);
+                } else if (event.type === 'complete') {
+                  contentEl.innerHTML = parseMarkdown(event.response || 'Completed with no output.');
+                } else if (event.type === 'error') {
+                  contentEl.innerHTML = `<span class="text-rose-500 font-mono">Error: ${escapeHtml(event.error)}</span>`;
+                }
+              } catch (e) {
+                console.error("SSE parse error", e);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        contentEl.innerHTML = `<span class="text-rose-500 font-mono">Network/Server Error: ${escapeHtml(err.toString())}</span>`;
+      } finally {
+        isGenerating = false;
+        syncTextarea();
+        updateTelemetry();
+        scrollToBottom();
+      }
+    }
+
+    // Modal Events
+    openConfigBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+    saveSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+    userProfileBtn.addEventListener('click', () => accountModal.classList.remove('hidden'));
+    closeAccountBtn.addEventListener('click', () => accountModal.classList.add('hidden'));
+
+    temperatureSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      let tag = "Analytical";
+      if (val > 0.6) tag = "Creative";
+      else if (val > 0.3) tag = "Balanced";
+      tempValueDisplay.textContent = `${val} (${tag})`;
+    });
+
+    shareChatBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      shareBtnText.textContent = 'Copied!';
+      setTimeout(() => { shareBtnText.textContent = 'Share'; }, 1800);
+    });
+
+    document.getElementById('exportSessionBtn').addEventListener('click', () => {
+      const text = messagesList.innerText || 'Empty session';
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `autoagent-session-${Date.now()}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('openShortcutsBtn').addEventListener('click', () => {
+      alert("Keyboard Shortcuts:\n• Enter: Send message\n• Shift+Enter: Newline\n• ⌘[: Toggle Sidebar\n• ⌘N: New Session\n• Esc: Close dialogs");
+    });
+
+    document.getElementById('openHelpBtn').addEventListener('click', () => {
+      alert("AutoAgent Studio v4.5\nPeaceful analytical interface powered by neuro-symbolic invariants and TTT attention.");
+    });
+  })();
+</script>
+</body>
+</html>

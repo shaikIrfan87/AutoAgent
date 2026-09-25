@@ -1,0 +1,68 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments & Packaging
+.venv/
+env/
+venv/
+ENV/
+.env
+.env.*
+!.env.example
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Quality
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+
+# AutoAgent Ephemeral Caches & Artifacts
+%SystemDrive%/
+.snapshots/
+.cold_replay_storage/*
+!.cold_replay_storage/.gitkeep
+cognitive_engine/assets/models/
+scratch/
+3
+powershell.cmd
+run.bat
+
+# IDE & Tool Specific
+.cursor/
+.windsurfrules
+.jetro/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# SQLite WAL & Journaling (persist primary .db files, ignore write-ahead logs)
+*.db-wal
+*.db-shm
+*.db-journal
+test_*.db
+
+# OS Artifacts
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1 @@
+is_even = lambda x: (int(not ((x % 2))))

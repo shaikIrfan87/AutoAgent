@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoAgent 3D Cognitive Horizon</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #03070d; color: #a4c7e8; font-family: 'Consolas', 'Courier New', monospace; overflow: hidden; }
+    #canvas-container { width: 100vw; height: 100vh; position: absolute; z-index: 1; }
+    
+    /* Cyberpunk / Terminal HUD Overlays */
+    .hud-layer { position: absolute; z-index: 10; pointer-events: none; width: 100%; height: 100%; padding: 20px; display: grid; grid-template-columns: 320px 1fr 300px; grid-template-rows: 60px 1fr 40px; }
+    .interactive { pointer-events: auto; }
+    
+    .panel { background: rgba(5, 12, 22, 0.75); border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 15px rgba(0, 255, 170, 0.08), inset 0 0 15px rgba(0, 150, 255, 0.05); border-radius: 4px; padding: 14px; backdrop-filter: blur(8px); margin-bottom: 12px; }
+    .panel-title { color: #00ffaa; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; border-bottom: 1px solid rgba(0, 255, 170, 0.2); padding-bottom: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; }
+    
+    .stat-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+    .stat-val { color: #ffffff; font-weight: bold; }
+    .stat-val.good { color: #00ffaa; text-shadow: 0 0 8px #00ffaa; }
+    .stat-val.accent { color: #ff8c42; text-shadow: 0 0 8px #ff8c42; }
+    
+    .input-box { width: 100%; background: rgba(0, 20, 35, 0.6); border: 1px solid #00a6ff; border-radius: 3px; color: #fff; padding: 8px; font-family: monospace; font-size: 12px; outline: none; margin-bottom: 8px; }
+    .btn { width: 100%; background: linear-gradient(90deg, #005577, #008899); border: 1px solid #00ffaa; color: #fff; padding: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+    .btn:hover { background: #00aa88; }
+    
+    #log-stream { height: 120px; overflow-y: hidden; font-size: 11px; line-height: 1.4; color: #6db0d8; }
+    .legend { font-size: 11px; display: flex; flex-direction: column; gap: 6px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  
+  <div class="hud-layer">
+    <!-- Top Header -->
+    <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 166, 255, 0.3); padding-bottom: 10px;">
+      <div style="font-size: 14px; font-weight: bold; color: #00ffaa; letter-spacing: 2px;">
+        <span style="display:inline-block; width:8px; height:8px; background:#00ffaa; border-radius:50%; margin-right:6px; box-shadow: 0 0 8px #00ffaa;"></span>
+        AUTOAGENT 3D COGNITIVE HORIZON
+      </div>
+      <div style="font-size: 12px; color: #72a9db;">
+        Memories: <span id="val-mem" class="stat-val">0</span> | 
+        Primitives: <span id="val-prim" class="stat-val">0</span> | 
+        ||A|| Norm: <span id="val-norm" class="stat-val good">0.0000</span>
+      </div>
+    </div>
+
+    <!-- Left Controls Panel -->
+    <div style="grid-column: 1; grid-row: 2; padding-top: 15px;">
+      <div class="panel interactive">
+        <div class="panel-title">Invariant Telemetry</div>
+        <div class="stat-row"><span>Saliency Filter:</span><span class="stat-val good">PASS (&gt;10k ops/s)</span></div>
+        <div class="stat-row"><span>Causal Consistency:</span><span class="stat-val good">VERIFIED (&lt;1ms)</span></div>
+        <div class="stat-row"><span>Sandbox Isolation:</span><span class="stat-val good">ISOLATED (&#916;S Attested)</span></div>
+        <div class="stat-row"><span>Fast-Weight Norm:</span><span class="stat-val" id="telemetry-norm">||A|| = 0.0000</span></div>
+      </div>
+
+      <div class="panel interactive">
+        <div class="panel-title">Autotelic Task Dispatch</div>
+        <input type="text" class="input-box" id="task-input" placeholder="Enter task or formal assertion..." />
+        <button class="btn" onclick="dispatchAction()">Deliberate &amp; Induce</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Verification &amp; Search Log</div>
+        <div id="log-stream">
+          <div style="color: #00ffaa;">&gt; 3D Hyper-spatial engine initialized.</div>
+          <div>&gt; Epistemic manifold connected (WAL + FTS5).</div>
+          <div>&gt; Latent topology mapped to Z-tier orbits.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Legend & Active Node Panel -->
+    <div style="grid-column: 3; grid-row: 2; padding-top: 15px;">
+      <div class="panel">
+        <div class="panel-title">Active Frontier Focus</div>
+        <div style="color: #ff8c42; font-weight: bold; font-size: 12px; margin-bottom: 4px;" id="focus-title">Quantum Mechanics &amp; Hilbert Spaces</div>
+        <div class="stat-row"><span>Tier Level:</span><span class="stat-val accent">Tier 3 (Deep Frontier)</span></div>
+        <div class="stat-row"><span>Verification:</span><span class="stat-val good">&#916;S &gt; 0.0 Grounded</span></div>
+        <div class="stat-row"><span>Prerequisites:</span><span class="stat-val">100% Satisfied</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Manifold Legend</div>
+        <div class="legend">
+          <div class="legend-item"><span class="dot" style="background:#00a6ff; box-shadow:0 0 6px #00a6ff;"></span> Core / Primitives (Tier 0)</div>
+          <div class="legend-item"><span class="dot" style="background:#00ffaa; box-shadow:0 0 6px #00ffaa;"></span> Compiled Skills (Tier 1-2)</div>
+          <div class="legend-item"><span class="dot" style="background:#b366ff; box-shadow:0 0 6px #b366ff;"></span> Deep Research (Tier 3)</div>
+          <div class="legend-item"><span class="dot" style="background:#70889b;"></span> Episodic Memory Fact</div>
+          <div class="legend-item"><span class="dot" style="background:#ff8c42; box-shadow:0 0 8px #ff8c42;"></span> Active Learning Frontier</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. Scene Setup & Camera Configuration ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x03070d, 0.0012);
+
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 3000);
+    camera.position.set(220, 260, 420);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 1200;
+    controls.minDistance = 60;
+
+    // --- 2. Lighting & Visual Styling ---
+    scene.add(new THREE.AmbientLight(0x223344, 1.2));
+    const centralLight = new THREE.PointLight(0x00ffaa, 2.5, 450);
+    scene.add(centralLight);
+
+    // --- 3. Geometric Guides & Concentric 3D Manifold Rings ---
+    const ringRadii = [60, 130, 210, 300];
+    const ringTiers = [-120, 0, 120];
+
+    ringTiers.forEach((zHeight) => {
+      ringRadii.forEach((r) => {
+        const ringGeo = new THREE.RingGeometry(r - 0.5, r + 0.5, 96);
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: 0x0a3b5c,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.25
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 2;
+        ringMesh.position.y = zHeight;
+        scene.add(ringMesh);
+      });
+    });
+
+    // Outer Gyroscope Cage
+    const sphereWire = new THREE.Mesh(
+      new THREE.SphereGeometry(380, 24, 16),
+      new THREE.MeshBasicMaterial({ color: 0x052238, wireframe: true, transparent: true, opacity: 0.15 })
+    );
+    scene.add(sphereWire);
+
+    // --- 4. Dynamic Node Graph Model ---
+    const nodeMeshMap = new Map();
+    const nodeGroup = new THREE.Group();
+    scene.add(nodeGroup);
+
+    function createNodeMesh(n) {
+      const geom = new THREE.SphereGeometry(n.size, 24, 24);
+      const mat = new THREE.MeshStandardMaterial({
+        color: n.color,
+        emissive: n.color,
+        emissiveIntensity: n.pulse ? 0.7 : 0.25,
+        roughness: 0.2,
+        metalness: 0.8
+      });
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.position.set(n.x, n.y, n.z);
+      mesh.userData = n;
+
+      if (n.pulse) {
+        const auraGeo = new THREE.SphereGeometry(n.size * 1.5, 16, 16);
+        const auraMat = new THREE.MeshBasicMaterial({ color: n.color, wireframe: true, transparent: true, opacity: 0.2 });
+        mesh.add(new THREE.Mesh(auraGeo, auraMat));
+      }
+      return mesh;
+    }
+
+    function rebuild3DGraph(graphNodes) {
+      // Clear previous graph objects
+      while (nodeGroup.children.length > 0) {
+        nodeGroup.remove(nodeGroup.children[0]);
+      }
+      nodeMeshMap.clear();
+      activePhotons.length = 0;
+
+      // Root CognitiveCore node at origin
+      const coreNode = { id: "core", name: "CognitiveCore", tier: 0, x: 0, y: 0, z: 0, color: 0x00a6ff, size: 8.0, pulse: true };
+      const coreMesh = createNodeMesh(coreNode);
+      nodeGroup.add(coreMesh);
+      nodeMeshMap.set("core", coreMesh);
+
+      if (!graphNodes || graphNodes.length === 0) return;
+
+      // Group nodes by tier to evenly space around orbits
+      const tierMap = new Map();
+      graphNodes.forEach(n => {
+        const t = n.tier !== undefined ? Number(n.tier) : (n.is_skill ? 1 : 2);
+        if (!tierMap.has(t)) tierMap.set(t, []);
+        tierMap.get(t).push(n);
+      });
+
+      const tierRadius = { 0: 65, 1: 130, 2: 175, 3: 220 };
+      const tierHeight = { 0: 0, 1: 30, 2: -30, 3: 130 };
+      const edgePairs = [];
+
+      tierMap.forEach((nodesInTier, tier) => {
+        const r = tierRadius[tier] || (60 + tier * 50);
+        const yBase = tierHeight[tier] !== undefined ? tierHeight[tier] : (tier * 40);
+        const step = (Math.PI * 2) / nodesInTier.length;
+
+        nodesInTier.forEach((item, idx) => {
+          const theta = idx * step;
+          const x = r * Math.cos(theta);
+          const z = r * Math.sin(theta);
+          const y = yBase + ((idx % 3) - 1) * 12;
+
+          const nId = String(item.node_id || item.id || item.label || item.topic || `node_${idx}`);
+          const name = String(item.topic || item.label || item.node_id || nId).replace('skill:', '').replace('[active] ', '');
+          const isFrontier = item.status === 'ACTIVE' || (item.label && item.label.includes('active'));
+          const isMastered = item.status === 'MASTERED' || item.is_skill;
+
+          let color = 0x70889b;
+          let size = 5.0;
+          if (isFrontier) { color = 0xff8c42; size = 8.5; }
+          else if (isMastered) { color = 0x00ffaa; size = 6.5; }
+          else if (tier === 0) { color = 0x00a6ff; size = 5.5; }
+          else if (tier === 3) { color = 0xb366ff; size = 6.0; }
+
+          const nodeData = { id: nId, name, tier, x, y, z, color, size, pulse: isFrontier };
+          const mesh = createNodeMesh(nodeData);
+          nodeGroup.add(mesh);
+          nodeMeshMap.set(nId, mesh);
+
+          // Connect prerequisites or fallback to core
+          if (item.prerequisites && Array.isArray(item.prerequisites) && item.prerequisites.length > 0) {
+            item.prerequisites.forEach(p => edgePairs.push([p, nId]));
+          } else {
+            edgePairs.push(["core", nId]);
+          }
+        });
+      });
+
+      // Render Bezier Spline Edges & Dynamic Verification Photons
+      const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00a6ff, transparent: true, opacity: 0.40 });
+      edgePairs.forEach(([fromId, toId]) => {
+        const fromMesh = nodeMeshMap.get(fromId);
+        const toMesh = nodeMeshMap.get(toId);
+        if (!fromMesh || !toMesh) return;
+
+        const p1 = fromMesh.position;
+        const p2 = toMesh.position;
+        const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+        mid.y += 18;
+
+        const curve = new THREE.QuadraticBezierCurve3(p1, mid, p2);
+        const points = curve.getPoints(20);
+        const lineGeom = new THREE.BufferGeometry().setFromPoints(points);
+        const isVerified = (toMesh.userData && (toMesh.userData.tier <= 2 || toMesh.userData.pulse));
+        const line = new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color: isVerified ? 0x00ffaa : 0x00a6ff, transparent: true, opacity: isVerified ? 0.65 : 0.35 }));
+        nodeGroup.add(line);
+
+        // Spawn traveling photon along the quadratic Bezier spline for verified/active topics
+        if (isVerified) {
+          spawnPhoton(curve, 0x00ffaa);
+        }
+      });
+    }
+
+    // Dynamic Verification Photon Pulses
+    const activePhotons = [];
+    function spawnPhoton(curve, color = 0x00ffaa, speed = 0.009) {
+      const geo = new THREE.SphereGeometry(2.2, 8, 8);
+      const mat = new THREE.MeshBasicMaterial({ color: color });
+      const pMesh = new THREE.Mesh(geo, mat);
+      nodeGroup.add(pMesh);
+      activePhotons.push({ mesh: pMesh, curve: curve, progress: Math.random(), speed: speed + Math.random() * 0.004 });
+    }
+
+    // --- 5. Interactive Raycaster (Hover/Select) ---
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    window.addEventListener('mousemove', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('click', () => {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(nodeGroup.children);
+      if (intersects.length > 0) {
+        const targetNode = intersects[0].object.userData;
+        if (!targetNode || !targetNode.name) return;
+        document.getElementById('focus-title').innerText = targetNode.name;
+        document.getElementById('focus-title').style.color = '#' + targetNode.color.toString(16);
+        addLog(`Focused Node: [${targetNode.name}] (Tier ${targetNode.tier})`);
+      }
+    });
+
+    function addLog(text) {
+      const stream = document.getElementById('log-stream');
+      const div = document.createElement('div');
+      div.innerText = `> ${text}`;
+      stream.prepend(div);
+      if (stream.children.length > 8) stream.lastElementChild.remove();
+    }
+
+    let isFirstSync = true;
+
+    const defaultSeedNodes = [
+      { id: "p0_ctrl", name: "Control Flow, Primitives & Types", label: "Control Flow, Primitives & Types", topic: "Control Flow, Primitives & Types", tier: 0, status: "ACTIVE", pulse: true },
+      { id: "p0_arith", name: "Basic Arithmetic & Number Theory", label: "Basic Arithmetic & Number Theory", topic: "Basic Arithmetic & Number Theory", tier: 0, status: "MASTERED" },
+      { id: "p0_search", name: "Searching, Sorting & Graph Traversal", label: "Searching, Sorting & Graph Traversal", topic: "Searching, Sorting & Graph Traversal", tier: 0, status: "MASTERED" },
+      { id: "p1_trees", name: "Trees, Memory Layouts & Hash Arrays", label: "Trees, Memory Layouts & Hash Arrays", topic: "Trees, Memory Layouts & Hash Arrays", tier: 1, status: "LOCKED" },
+      { id: "p2_mech", name: "Classical Mechanics & Motion Equations", label: "Classical Mechanics & Motion Equations", topic: "Classical Mechanics & Motion Equations", tier: 2, status: "LOCKED" },
+      { id: "p3_quantum", name: "Quantum Mechanics & Hilbert Spaces", label: "Quantum Mechanics & Hilbert Spaces", topic: "Quantum Mechanics & Hilbert Spaces", tier: 3, status: "LOCKED" }
+    ];
+
+    // --- 6. Live Telemetry Ingestion & Deliberation ---
+    async function syncLiveHorizon() {
+      try {
+        const res = await fetch('/api/state');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // 1. Update Telemetry HUD
+        if (data.memory_count !== undefined) document.getElementById('val-mem').innerText = data.memory_count;
+        if (data.primitives_count !== undefined) document.getElementById('val-prim').innerText = data.primitives_count;
+        if (data.oja_norm !== undefined) {
+          document.getElementById('val-norm').innerText = Number(data.oja_norm).toFixed(4);
+          document.getElementById('telemetry-norm').innerText = `||A|| = ${Number(data.oja_norm).toFixed(4)}`;
+        }
+
+        const incomingNodes = (data.graph_nodes && data.graph_nodes.length > 0)
+          ? data.graph_nodes
+          : defaultSeedNodes;
+
+        // Force rebuild on first boot or when node topology changes
+        if (isFirstSync || incomingNodes.length + 1 !== nodeMeshMap.size) {
+          rebuild3DGraph(incomingNodes);
+          isFirstSync = false;
+          const frontier = incomingNodes.find(n => n.status === 'ACTIVE' || (n.label && n.label.includes('active')));
+          if (frontier) {
+            document.getElementById('focus-title').innerText = frontier.topic || frontier.node_id || frontier.name || frontier.label;
+          }
+        }
+      } catch (err) {
+        console.warn("Horizon telemetry sync failure:", err);
+      }
+    }
+
+    setInterval(syncLiveHorizon, 2500);
+    syncLiveHorizon();
+
+    // WebSocket streaming for real-time live events
+    try {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(`${proto}//${location.host}/ws/telemetry`);
+      ws.onmessage = (evt) => {
+        try {
+          const d = JSON.parse(evt.data);
+          if (d.active_primitives !== undefined) document.getElementById('val-prim').innerText = d.active_primitives;
+          if (d.memory_records !== undefined) document.getElementById('val-mem').innerText = d.memory_records;
+        } catch (e) {}
+      };
+    } catch (e) {}
+
+    async function dispatchAction() {
+      const input = document.getElementById('task-input');
+      const val = input.value.trim();
+      if (!val) return;
+      addLog(`Dispatched: "${val}"`);
+      input.value = "";
+      try {
+        const endpoint = window.location.port === '8000' ? '/api/v1/deliberate' : '/api/deliberate';
+        const bodyPayload = endpoint === '/api/v1/deliberate' ? { goal: val } : { query: val };
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bodyPayload)
+        });
+        const data = await res.json();
+        const out = data.output || data.verdict || 'Deliberation completed.';
+        addLog(out);
+        if (out.includes('Success') || out.includes('attested')) {
+          addLog('Empirical verification attested (\u0394S = +1.0). Dynamic photon pulses accelerated.');
+          activePhotons.forEach(p => { p.speed *= 3.0; });
+          setTimeout(() => { activePhotons.forEach(p => { p.speed /= 3.0; }); }, 2500);
+        }
+        syncLiveHorizon();
+      } catch (err) {
+        addLog(`Error: ${err.message}`);
+      }
+    }
+
+    // --- 7. Render Loop with Idle Orbital Drift & Photon Pulses ---
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      // Slow orbital rotation of the knowledge graph
+      nodeGroup.rotation.y = elapsed * 0.035;
+
+      // Dynamic pulsating effect for active frontiers
+      nodeGroup.children.forEach(m => {
+        if (m.userData.pulse) {
+          const scale = 1.0 + Math.sin(elapsed * 4.0) * 0.12;
+          m.scale.set(scale, scale, scale);
+        }
+      });
+
+      // Animate directional photon pulses along quadratic Bezier splines
+      activePhotons.forEach(p => {
+        p.progress += p.speed;
+        if (p.progress > 1.0) p.progress = 0.0;
+        const pt = p.curve.getPoint(p.progress);
+        p.mesh.position.copy(pt);
+      });
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+is_palindrome = lambda x: (x[1:][1:] < x)

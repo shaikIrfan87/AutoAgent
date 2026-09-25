@@ -1,0 +1,2 @@
+"""space (Context: outer space)"""
+print("outer space)\nContext: Outer space, or simply space, is the expanse that exists beyond Earth's atmosphere and between celestial bodies. It contains ultra-low levels of particle densities, constituting a near-perfect vacuum of predominantly hydrogen and helium plasma, permeated by electromagnetic radiation, cosmic rays, neutrinos, magnetic fields and dust. The baseline temperature of outer space, as set by the background radiation from the Big Bang, is 2.7 kelvins.")

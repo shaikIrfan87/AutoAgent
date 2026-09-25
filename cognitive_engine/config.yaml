@@ -1,0 +1,26 @@
+saliency:
+  entropy_threshold: 2.0
+  buffer_size: 256
+  dim: 384
+  deliberation_threshold: 0.45
+  uncertainty_novelty_weight: 0.6
+  uncertainty_entropy_weight: 0.4
+
+causal:
+  max_hops: 2
+
+sandbox:
+  timeout_seconds: 5.0
+
+plasticity:
+  dim: 384
+  gamma: 0.95
+  eta: 0.02
+  frobenius_limit: 2.0
+
+consolidation:
+  db_path: "memories.db"
+  lambda_decay: 0.05
+  prune_threshold: 0.20
+  boost_factor: 0.15
+  initial_confidence: 0.80

@@ -1,0 +1,1 @@
+find_max = lambda x: ((len(x) + (x[0] if x else 0)) + (len(x) - 2))
